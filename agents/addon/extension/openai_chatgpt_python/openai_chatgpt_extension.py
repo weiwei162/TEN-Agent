@@ -150,7 +150,8 @@ class OpenAIChatGPTExtension(Extension):
         "function": {
             # ensure you use gpt-4o or later model if you need image recognition, gpt-4o-mini does not work quite well in this case
             "name": "get_vision_image",
-            "description": "Get the image from camera. Call this whenever you need to understand the input camera image like you have vision capability, for example when user asks 'What can you see?' or 'Can you see me?'",
+            # "description": "Get the image from camera. Call this whenever you need to understand the input camera image like you have vision capability, for example when user asks 'What can you see?' or 'Can you see me?'",
+            "description": "从摄像头获取图像。在你需要理解视觉或图像输入的时候调用这个工具，例如当用户询问'你是否能看到我'或者'能看到我吗'"
         },
         "strict": True,
     }]
@@ -378,6 +379,9 @@ class OpenAIChatGPTExtension(Extension):
         full_content = ""
         first_sentence_sent = False
 
+        logger.info(f"{chat_completions}")
+                
+
         for chat_completion in chat_completions:
             content = ""
             if start_time < self.outdate_ts:
@@ -437,7 +441,7 @@ class OpenAIChatGPTExtension(Extension):
                 ]}
                 logger.info(f"msg: {message}")
 
-            resp = self.openai_chatgpt.get_chat_completions_stream(memory + [message])
+            resp = self.openai_chatgpt.get_chat_completions_stream(memory + [message], None, "step-1v-8k")
             if resp is None:
                 logger.error(f"get_chat_completions_stream Response is None: {input_text}")
                 return
@@ -454,7 +458,7 @@ class OpenAIChatGPTExtension(Extension):
             
             tools = self.available_tools if self.enable_tools else None
             logger.info(f"chat_completion tools: {tools}")
-            resp = self.openai_chatgpt.get_chat_completions_stream(memory + [message], tools)
+            resp = self.openai_chatgpt.get_chat_completions_stream(memory + [message], tools, "step-1-8k")
             if resp is None:
                 logger.error(f"get_chat_completions_stream Response is None: {input_text}")
                 return

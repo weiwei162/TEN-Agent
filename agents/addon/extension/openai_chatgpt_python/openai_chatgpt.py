@@ -65,9 +65,9 @@ class OpenAIChatGPT:
             self.session.proxies.update(proxies)
         self.client.session = self.session
 
-    def get_chat_completions_stream(self, messages, tools = None):
+    def get_chat_completions_stream(self, messages, tools = None, model = None):
         req = {
-            "model": self.config.model,
+            "model": self.config.model if model is None else model,
             "messages": [
                 {
                     "role": "system",
