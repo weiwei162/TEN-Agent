@@ -46,6 +46,7 @@ from ten_ai_base.types import (
 from .realtime.connection import RealtimeApiConnection
 from .realtime.struct import (
     ItemCreate,
+    ServerVADUpdateParams,
     SessionCreated,
     ItemCreated,
     UserMessageItemParam,
@@ -580,6 +581,10 @@ class OpenAIRealtimeExtension(AsyncLLMBaseExtension):
             session=SessionUpdateParams(
                 instructions=prompt,
                 model=self.config.model,
+                temperature=self.config.temperature,
+                turn_detection=ServerVADUpdateParams(
+                    silence_duration_ms=500
+                ),
                 tool_choice="none",
                 tools=tools,
             )
