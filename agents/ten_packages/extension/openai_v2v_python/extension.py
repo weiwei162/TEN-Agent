@@ -144,6 +144,7 @@ class OpenAIRealtimeExtension(AsyncLLMBaseExtension):
         self.first_token_times = []
 
         self.buff: bytearray = b""
+        self.input_audio_buffer = asyncio.Queue()
         self.transcript: str = ""
         self.ctx: dict = {}
         self.input_end = time.time()
@@ -161,6 +162,8 @@ class OpenAIRealtimeExtension(AsyncLLMBaseExtension):
 
         self.config = await OpenAIRealtimeConfig.create_async(ten_env=ten_env)
         ten_env.log_info(f"config: {self.config}")
+
+        self.loop.create_task(self._on_send_audio_loop())
 
         if not self.config.api_key:
             ten_env.log_error("api_key is required")
@@ -526,11 +529,16 @@ class OpenAIRealtimeExtension(AsyncLLMBaseExtension):
 
     # Direction: IN
     async def _on_audio(self, buff: bytearray):
-        self.buff += buff
+        # self.buff += buff
         # Buffer audio
-        if self.connected and len(self.buff) >= self.audio_len_threshold:
-            await self.conn.send_audio_data(self.buff)
-            self.buff = b""
+        if self.connected:
+            self.input_audio_buffer.put_nowait(buff)
+    async def _on_send_audio_loop(self):
+        while True:
+            buff = await self.input_audio_buffer.get()
+            if self.connected:
+                await self.conn.send_audio_data(buff)
+            
 
     async def _update_session(self) -> None:
         tools = []
