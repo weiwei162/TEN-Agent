@@ -7,7 +7,7 @@ import aiohttp
 from ten import AsyncTenEnv
 
 from typing import Any, AsyncGenerator
-from .struct import InputAudioBufferAppend, ClientToServerMessage, ServerToClientMessage, parse_server_message, to_json
+from .struct import InputAudioBufferAppend, ClientToServerMessage, ResponseAudioDelta, ServerToClientMessage, parse_server_message, to_json
 
 DEFAULT_VIRTUAL_MODEL = "gpt-4o-realtime-preview"
 
@@ -40,7 +40,7 @@ class RealtimeApiConnection:
         path: str = "/v1/realtime",
         model: str = DEFAULT_VIRTUAL_MODEL,
         vendor: str = "",
-        verbose: bool = False
+        verbose: bool = True
     ):
         self.ten_env = ten_env
         self.vendor = vendor
@@ -85,7 +85,7 @@ class RealtimeApiConnection:
     async def send_request(self, message: ClientToServerMessage):
         assert self.websocket is not None
         message_str = to_json(message)
-        if self.verbose:
+        if self.verbose and not isinstance(message, InputAudioBufferAppend):
             self.ten_env.log_info(f"-> {smart_str(message_str)}")
         await self.websocket.send_str(message_str)
 
@@ -96,9 +96,10 @@ class RealtimeApiConnection:
         try:
             async for msg in self.websocket:
                 if msg.type == aiohttp.WSMsgType.TEXT:
-                    if self.verbose:
+                    server_message = self.handle_server_message(msg.data)
+                    if self.verbose and not isinstance(server_message, ResponseAudioDelta):
                         self.ten_env.log_info(f"<- {smart_str(msg.data)}")
-                    yield self.handle_server_message(msg.data)
+                    yield server_message
                 elif msg.type == aiohttp.WSMsgType.ERROR:
                     self.ten_env.log_error("Error during receive: %s", self.websocket.exception())
                     break

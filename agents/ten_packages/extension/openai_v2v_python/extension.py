@@ -137,7 +137,7 @@ class OpenAIRealtimeExtension(AsyncLLMBaseExtension):
         self.stream_id: int = 0
         self.remote_stream_id: int = 0
         self.channel_name: str = ""
-        self.audio_len_threshold: int = 5120
+        self.audio_len_threshold: int = 160
 
         self.completion_times = []
         self.connect_times = []
@@ -288,52 +288,52 @@ class OpenAIRealtimeExtension(AsyncLLMBaseExtension):
                             self.session = message.session
                             await self._update_session()
 
-                            history = self.memory.get()
-                            for h in history:
-                                if h["role"] == "user":
-                                    await self.conn.send_request(
-                                        ItemCreate(
-                                            item=UserMessageItemParam(
-                                                content=[
-                                                    {
-                                                        "type": ContentType.InputText,
-                                                        "text": h["content"],
-                                                    }
-                                                ]
-                                            )
-                                        )
-                                    )
-                                elif h["role"] == "assistant":
-                                    await self.conn.send_request(
-                                        ItemCreate(
-                                            item=AssistantMessageItemParam(
-                                                content=[
-                                                    {
-                                                        "type": ContentType.InputText,
-                                                        "text": h["content"],
-                                                    }
-                                                ]
-                                            )
-                                        )
-                                    )
-                            self.ten_env.log_info(f"Finish send history {history}")
-                            self.memory.clear()
+                            # history = self.memory.get()
+                            # for h in history:
+                            #     if h["role"] == "user":
+                            #         await self.conn.send_request(
+                            #             ItemCreate(
+                            #                 item=UserMessageItemParam(
+                            #                     content=[
+                            #                         {
+                            #                             "type": ContentType.InputText,
+                            #                             "text": h["content"],
+                            #                         }
+                            #                     ]
+                            #                 )
+                            #             )
+                            #         )
+                            #     elif h["role"] == "assistant":
+                            #         await self.conn.send_request(
+                            #             ItemCreate(
+                            #                 item=AssistantMessageItemParam(
+                            #                     content=[
+                            #                         {
+                            #                             "type": ContentType.InputText,
+                            #                             "text": h["content"],
+                            #                         }
+                            #                     ]
+                            #                 )
+                            #             )
+                            #         )
+                            # self.ten_env.log_info(f"Finish send history {history}")
+                            # self.memory.clear()
 
                             if not self.connected:
                                 self.connected = True
-                                await self._greeting()
+                            #     await self._greeting()
                         case ItemInputAudioTranscriptionCompleted():
                             self.ten_env.log_info(
                                 f"On request transcript {message.transcript}"
                             )
                             self._send_transcript(message.transcript, Role.User, True)
-                            self.memory.put(
-                                {
-                                    "role": "user",
-                                    "content": message.transcript,
-                                    "id": message.item_id,
-                                }
-                            )
+                            # self.memory.put(
+                            #     {
+                            #         "role": "user",
+                            #         "content": message.transcript,
+                            #         "id": message.item_id,
+                            #     }
+                            # )
                         case ItemInputAudioTranscriptionFailed():
                             self.ten_env.log_warn(
                                 f"On request transcript failed {message.item_id} {message.error}"
@@ -436,13 +436,13 @@ class OpenAIRealtimeExtension(AsyncLLMBaseExtension):
                             )
                             # Tuncate the on-going audio stream
                             end_ms = get_time_ms() - relative_start_ms
-                            if item_id:
-                                truncate = ItemTruncate(
-                                    item_id=item_id,
-                                    content_index=content_index,
-                                    audio_end_ms=end_ms,
-                                )
-                                await self.conn.send_request(truncate)
+                            # if item_id:
+                            #     truncate = ItemTruncate(
+                            #         item_id=item_id,
+                            #         content_index=content_index,
+                            #         audio_end_ms=end_ms,
+                            #     )
+                            #     await self.conn.send_request(truncate)
                             if self.config.server_vad:
                                 await self._flush()
                             if response_id and self.transcript:
@@ -535,43 +535,44 @@ class OpenAIRealtimeExtension(AsyncLLMBaseExtension):
     async def _update_session(self) -> None:
         tools = []
 
-        def tool_dict(tool: LLMToolMetadata):
-            t = {
-                "type": "function",
-                "name": tool.name,
-                "description": tool.description,
-                "parameters": {
-                    "type": "object",
-                    "properties": {},
-                    "required": [],
-                    "additionalProperties": False,
-                },
-            }
+        # def tool_dict(tool: LLMToolMetadata):
+        #     t = {
+        #         "type": "function",
+        #         "name": tool.name,
+        #         "description": tool.description,
+        #         "parameters": {
+        #             "type": "object",
+        #             "properties": {},
+        #             "required": [],
+        #             "additionalProperties": False,
+        #         },
+        #     }
 
-            for param in tool.parameters:
-                t["parameters"]["properties"][param.name] = {
-                    "type": param.type,
-                    "description": param.description,
-                }
-                if param.required:
-                    t["parameters"]["required"].append(param.name)
+        #     for param in tool.parameters:
+        #         t["parameters"]["properties"][param.name] = {
+        #             "type": param.type,
+        #             "description": param.description,
+        #         }
+        #         if param.required:
+        #             t["parameters"]["required"].append(param.name)
 
-            return t
+        #     return t
 
-        if self.available_tools:
-            tool_prompt = "You have several tools that you can get help from:\n"
-            for t in self.available_tools:
-                tool_prompt += f"- ***{t.name}***: {t.description}"
-            self.ctx["tools"] = tool_prompt
-            tools = [tool_dict(t) for t in self.available_tools]
-        prompt = self._replace(self.config.prompt)
+        # if self.available_tools:
+        #     tool_prompt = "You have several tools that you can get help from:\n"
+        #     for t in self.available_tools:
+        #         tool_prompt += f"- ***{t.name}***: {t.description}"
+        #     self.ctx["tools"] = tool_prompt
+        #     tools = [tool_dict(t) for t in self.available_tools]
+        # prompt = self._replace(self.config.prompt)
+        prompt = self.config.prompt
 
         self.ten_env.log_info(f"update session {prompt} {tools}")
         su = SessionUpdate(
             session=SessionUpdateParams(
                 instructions=prompt,
                 model=self.config.model,
-                tool_choice="auto" if self.available_tools else "none",
+                tool_choice="none",
                 tools=tools,
             )
         )
@@ -750,19 +751,20 @@ class OpenAIRealtimeExtension(AsyncLLMBaseExtension):
         return content_parts
 
     async def _greeting(self) -> None:
-        if self.connected and self.users_count == 1:
-            text = self._greeting_text()
-            if self.config.greeting:
-                text = "Say '" + self.config.greeting + "' to me."
-            self.ten_env.log_info(f"send greeting {text}")
-            await self.conn.send_request(
-                ItemCreate(
-                    item=UserMessageItemParam(
-                        content=[{"type": ContentType.InputText, "text": text}]
-                    )
-                )
-            )
-            await self.conn.send_request(ResponseCreate())
+        pass
+        # if self.connected and self.users_count == 1:
+        #     text = self._greeting_text()
+        #     if self.config.greeting:
+        #         text = "Say '" + self.config.greeting + "' to me."
+        #     self.ten_env.log_info(f"send greeting {text}")
+        #     await self.conn.send_request(
+        #         ItemCreate(
+        #             item=UserMessageItemParam(
+        #                 content=[{"type": ContentType.InputText, "text": text}]
+        #             )
+        #         )
+        #     )
+        #     await self.conn.send_request(ResponseCreate())
 
     async def _flush(self) -> None:
         try:

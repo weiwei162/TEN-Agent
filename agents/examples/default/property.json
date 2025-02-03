@@ -506,7 +506,7 @@
               "subscribe_audio": true,
               "publish_audio": true,
               "publish_data": true,
-              "subscribe_audio_sample_rate": 24000
+              "subscribe_audio_sample_rate": 16000
             }
           },
           {
@@ -517,13 +517,14 @@
             "property": {
               "api_key": "${env:OPENAI_REALTIME_API_KEY}",
               "temperature": 0.9,
-              "model": "gpt-4o-realtime-preview-2024-12-17",
+              "model": "gpt-4o-realtime-preview",
               "max_tokens": 2048,
-              "voice": "alloy",
+              "voice": "coral",
               "language": "en-US",
               "server_vad": true,
               "dump": true,
-              "max_history": 10
+              "max_history": 10,
+              "prompt": "You are a language learning coach teaching French to an English user. Speak in English (with a french accent) unless correcting a French word. Ask the user to translate English words into French. Adjust the hardness level to suite their skills which you can infer as you go. From time to time, re-test words but only words that were previously got wrong by the user. Avoid asking the same thing again once the user gets it correct and ensure you are listening out for the response you expect, don't assume the user will get it correct. Don't say the it was correct when it was not."
             }
           },
           {
