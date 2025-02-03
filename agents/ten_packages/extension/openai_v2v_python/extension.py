@@ -223,7 +223,7 @@ class OpenAIRealtimeExtension(AsyncLLMBaseExtension):
                 self.remote_stream_id = stream_id
 
             frame_buf = audio_frame.get_buf()
-            self._dump_audio_if_need(frame_buf, Role.User)
+            # self._dump_audio_if_need(frame_buf, Role.User)
 
             await self._on_audio(frame_buf)
             if not self.config.server_vad:
