@@ -42,38 +42,39 @@ class OpenAIChatGPTConfig(BaseConfig):
 
 
 class ReasoningMode(str, Enum):
-    ModeV1= "v1"
+    ModeV1 = "v1"
+
 
 class ThinkParser:
     def __init__(self):
-        self.state = 'NORMAL'  # States: 'NORMAL', 'THINK'
+        self.state = "NORMAL"  # States: 'NORMAL', 'THINK'
         self.think_content = ""
         self.content = ""
-    
+
     def process(self, new_chars):
         if new_chars == "<think>":
-            self.state = 'THINK'
+            self.state = "THINK"
             return True
         elif new_chars == "</think>":
-            self.state = 'NORMAL'
+            self.state = "NORMAL"
             return True
         else:
             if self.state == "THINK":
                 self.think_content += new_chars
         return False
-    
+
     def process_by_reasoning_content(self, reasoning_content):
         state_changed = False
         if reasoning_content:
-            if self.state == 'NORMAL':
-                self.state = 'THINK'
+            if self.state == "NORMAL":
+                self.state = "THINK"
                 state_changed = True
             self.think_content += reasoning_content
-        elif self.state == 'THINK':
-            self.state = 'NORMAL'
+        elif self.state == "THINK":
+            self.state = "NORMAL"
             state_changed = True
         return state_changed
-        
+
 
 class OpenAIChatGPT:
     client = None
@@ -92,10 +93,14 @@ class OpenAIChatGPT:
                 f"Using Azure OpenAI with endpoint: {config.azure_endpoint}, api_version: {config.azure_api_version}"
             )
         else:
-            self.client = AsyncOpenAI(api_key=config.api_key, base_url=config.base_url, default_headers={
-                "api-key": config.api_key,
-                "Authorization": f"Bearer {config.api_key}"
-            })
+            self.client = AsyncOpenAI(
+                api_key=config.api_key,
+                base_url=config.base_url,
+                default_headers={
+                    "api-key": config.api_key,
+                    "Authorization": f"Bearer {config.api_key}",
+                },
+            )
         self.session = requests.Session()
         if config.proxy_url:
             proxies = {
@@ -172,14 +177,20 @@ class OpenAIChatGPT:
         reasoning_mode = None
 
         async for chat_completion in response:
-            # self.ten_env.log_info(f"Chat completion: {chat_completion}")
+            self.ten_env.log_info(f"Chat completion: {chat_completion}")
             if len(chat_completion.choices) == 0:
                 continue
             choice = chat_completion.choices[0]
             delta = choice.delta
 
             content = delta.content if delta and delta.content else ""
-            reasoning_content = delta.reasoning_content if delta and hasattr(delta, "reasoning_content") and delta.reasoning_content else ""
+            reasoning_content = (
+                delta.reasoning_content
+                if delta
+                and hasattr(delta, "reasoning_content")
+                and delta.reasoning_content
+                else ""
+            )
 
             if reasoning_mode is None and reasoning_content is not None:
                 reasoning_mode = ReasoningMode.ModeV1
@@ -190,7 +201,9 @@ class OpenAIChatGPT:
 
                 if reasoning_mode == ReasoningMode.ModeV1:
                     self.ten_env.log_info("process_by_reasoning_content")
-                    think_state_changed = parser.process_by_reasoning_content(reasoning_content)
+                    think_state_changed = parser.process_by_reasoning_content(
+                        reasoning_content
+                    )
                 else:
                     think_state_changed = parser.process(content)
 
@@ -208,24 +221,41 @@ class OpenAIChatGPT:
             full_content += content
 
             if delta.tool_calls:
-                for tool_call in delta.tool_calls:
-                    if tool_call.id is not None:
-                        tool_calls_dict[tool_call.index]["id"] = tool_call.id
+                try:
+                    for tool_call in delta.tool_calls:
+                        self.ten_env.log_info(f"Tool call: {tool_call}")
+                        if tool_call.index not in tool_calls_dict:
+                            tool_calls_dict[tool_call.index] = {
+                                "id": None,
+                                "function": {"arguments": "", "name": None},
+                                "type": None,
+                            }
 
-                    # If the function name is not None, set it
-                    if tool_call.function.name is not None:
-                        tool_calls_dict[tool_call.index]["function"][
-                            "name"
-                        ] = tool_call.function.name
+                        if tool_call.id:
+                            tool_calls_dict[tool_call.index]["id"] = tool_call.id
 
-                    # Append the arguments
-                    tool_calls_dict[tool_call.index]["function"][
-                        "arguments"
-                    ] += tool_call.function.arguments
+                        # If the function name is not None, set it
+                        if tool_call.function.name:
+                            tool_calls_dict[tool_call.index]["function"][
+                                "name"
+                            ] = tool_call.function.name
 
-                    # If the type is not None, set it
-                    if tool_call.type is not None:
-                        tool_calls_dict[tool_call.index]["type"] = tool_call.type
+                        # Append the arguments if not None
+                        if tool_call.function.arguments:
+                            tool_calls_dict[tool_call.index]["function"][
+                                "arguments"
+                            ] += tool_call.function.arguments
+
+                        # If the type is not None, set it
+                        if tool_call.type:
+                            tool_calls_dict[tool_call.index]["type"] = tool_call.type
+                except Exception as e:
+                    import traceback
+
+                    traceback.print_exc()
+                    self.ten_env.log_error(
+                        f"Error processing tool call: {e} {tool_calls_dict}"
+                    )
 
         # Convert the dictionary to a list
         tool_calls_list = list(tool_calls_dict.values())
