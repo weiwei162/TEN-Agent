@@ -1,6 +1,6 @@
 <div align="center"> <a name="readme-top"></a>
 
-![TEN Agent banner](https://github.com/TEN-framework/docs/blob/main/assets/jpg/banner.jpg?raw=true)
+![TEN Agent banner](https://ten-framework-assets.s3.us-east-1.amazonaws.com/banner.jpg)
 
 [![Follow on X](https://img.shields.io/twitter/follow/TenFramework?logo=X&color=%20%23f5f5f5)](https://twitter.com/intent/follow?screen_name=TenFramework)
 [![Discussion posts](https://img.shields.io/github/discussions/TEN-framework/ten-agent?labelColor=%20%23FDB062&color=%20%23f79009)](https://github.com/TEN-framework/ten-agent/discussions/)
@@ -90,7 +90,7 @@ TEN Agent is a conversational voice AI agent powered by TEN, integrating **DeepS
 
 <br>
 
-![TEN star us gif](https://github.com/TEN-framework/docs/blob/main/assets/new/star-us.gif?raw=true)
+![TEN star us gif](https://ten-framework-assets.s3.us-east-1.amazonaws.com/star-us.gif)
 
 <details>
   <summary><kbd>Star History</kbd></summary>
@@ -119,7 +119,7 @@ TEN Agent now integrates with Llama 4, Meta's latest large language model. With 
   <br>
   <picture>
 
-  ![TEN Agent with Llama 4](https://github.com/TEN-framework/docs/blob/main/assets/new/ten-llama4.jpg?raw=true)
+  ![TEN Agent with Llama 4](https://ten-framework-assets.s3.us-east-1.amazonaws.com/ten-llama4.jpg)
 
   </picture>
 
@@ -130,6 +130,8 @@ TEN Agent now integrates with Llama 4, Meta's latest large language model. With 
 [![][back-to-top]](#readme-top)
 
 </div>
+
+<br>
 
 ### 2️⃣ 🔥 TEN Agent + MCP
 
@@ -163,7 +165,7 @@ Build engaging AI avatars with TEN Agent using [Trulience](https://trulience.com
   <br>
   <picture>
 
-  ![TEN Agent with Trulience](https://github.com/TEN-framework/docs/blob/main/assets/gif/ten-trulience.gif?raw=true)
+  ![TEN Agent with Trulience](https://ten-framework-assets.s3.us-east-1.amazonaws.com/ten-trulience.gif)
 
   </picture>
 
@@ -174,6 +176,8 @@ Build engaging AI avatars with TEN Agent using [Trulience](https://trulience.com
 [![][back-to-top]](#readme-top)
 
 </div>
+
+<br>
 
 ### 4️⃣ [TEN Agent + DeepSeek](https://ten-framework.medium.com/deepgram-deepseek-fish-audio-build-your-own-voice-assistant-with-ten-agent-d3ee65faabe8)
 
@@ -185,6 +189,8 @@ TEN is a very versatile framework. That said, TEN Agent is compatible with DeepS
 
 </div>
 
+<br>
+
 ### 5️⃣ [TEN Agent + ESP32](https://github.com/TEN-framework/TEN-Agent/tree/main/esp32-client)
 
 TEN Agent is now running on the Espressif ESP32-S3 Korvo V3 development board, an excellent way to integrate realtime communication with LLM on hardware.
@@ -195,27 +201,19 @@ TEN Agent is now running on the Espressif ESP32-S3 Korvo V3 development board, a
 
 </div>
 
+<br>
+
 ### 6️⃣ TEN Agent + Gemini Multimodal Live API
 
 Try Google Gemini Multimodal Live API with realtime vision and realtime screenshare detection capabilities, it is a ready-to-use extension, along with powerful tools like Weather Check and Web Search integrated perfectly into TEN Agent.
-
-<details>
-  <summary><kbd>Gemini 2.0 Multimodal Live API</kbd></summary>
-
-  <br>
-  <picture>
-
-  ![Usecases](https://github.com/TEN-framework/docs/blob/main/assets/gif/gemini.gif?raw=true)
-
-  </picture>
-
-</details>
 
 <div align="right">
 
 [![][back-to-top]](#readme-top)
 
 </div>
+
+<br>
 
 ### 7️⃣ TEN Agent + Storyteller + Image Generator
 
@@ -227,7 +225,7 @@ Describe a topic and ask TEN Agent to tell you a story while also generating ima
   <br>
   <picture>
 
-  ![Usecases](https://github.com/TEN-framework/docs/blob/main/assets/jpg/storyteller_image_generator.jpg?raw=true)
+  ![Usecases](https://ten-framework-assets.s3.us-east-1.amazonaws.com/storyteller_image_generator.jpg)
 
   </picture>
 
@@ -238,6 +236,8 @@ Describe a topic and ask TEN Agent to tell you a story while also generating ima
 [![][back-to-top]](#readme-top)
 
 </div>
+
+<br>
 
 ### 8️⃣ TEN Agent + Dify
 
@@ -245,23 +245,13 @@ Describe a topic and ask TEN Agent to tell you a story while also generating ima
 
 TEN offers a great support to make the realtime interactive experience even better on other LLM platform as well, check out docs for more.
 
-<details>
-  <summary><kbd>TEN Agent + Dify with RAG</kbd></summary>
-
-  <br>
-  <picture>
-
-  ![Dify with RAG](https://github.com/TEN-framework/docs/blob/main/assets/gif/dify-rag.gif?raw=true)
-
-  </picture>
-
-</details>
-
 <div align="right">
 
 [![][back-to-top]](#readme-top)
 
 </div>
+
+<br>
 
 ### 9️⃣ TEN Agent + Coze
 
@@ -279,7 +269,7 @@ TEN seamlessly integrates with Coze platform to enhance real-time interactive ex
 
 ## 💡 TEN Agent Usecases
 
-![Usecases](https://github.com/TEN-framework/docs/blob/main/assets/jpg/usecases.jpg?raw=true)
+![Usecases](https://ten-framework-assets.s3.us-east-1.amazonaws.com/usecases.jpg)
 
 <div align="right">
 
@@ -291,7 +281,7 @@ TEN seamlessly integrates with Coze platform to enhance real-time interactive ex
 
 ## 🧩 Ready-to-use Extensions
 
-![Ready-to-use Extensions](https://github.com/TEN-framework/docs/blob/main/assets/jpg/extensions.jpg?raw=true)
+![Ready-to-use Extensions](https://ten-framework-assets.s3.us-east-1.amazonaws.com/extensions.jpg)
 
 <div align="right">
 
@@ -377,12 +367,12 @@ task run
  3. Select an extension and configure its API key and settings
 
 <details>
-  <summary><kbd>Module Picker Example</kbd></summary>
+  <summary><kbd>Module Picker Example - Gemini</kbd></summary>
 
   <br>
   <picture>
 
-  ![Module Picker Example](https://github.com/TEN-framework/docs/blob/main/assets/gif/module-example.gif?raw=true)
+  ![Module Picker Example](https://ten-framework-assets.s3.us-east-1.amazonaws.com/module-example.gif)
 
   </picture>
 
@@ -463,7 +453,7 @@ Read the [Deployment Guide](https://doc.theten.ai/docs/ten_agent/deployment_ten_
 - `port:3000` Playground - To customize and test your agent configurations.
 - `port:3002` Demo - To deploy your agent without module picker.
 
-![Components Diagram](https://github.com/TEN-framework/docs/blob/main/assets/jpg/diagram.jpg?raw=true)
+![Components Diagram](https://ten-framework-assets.s3.us-east-1.amazonaws.com/diagram.jpg)
 
 <div align="right">
 
@@ -529,12 +519,12 @@ This project is [Apache 2.0](LICENSE) licensed.
 [ten-framework-shield]: https://img.shields.io/github/stars/ten-framework/ten_framework?color=ffcb47&labelColor=gray&style=flat-square&logo=github
 [ten-agent-shield]: https://img.shields.io/github/stars/ten-framework/ten-agent?color=ffcb47&labelColor=gray&style=flat-square&logo=github
 [tman-designer-shield]: https://img.shields.io/github/stars/ten-framework/ten_ai_base?color=ffcb47&labelColor=gray&style=flat-square&logo=github
-[ten-docs-shield]: https://img.shields.io/github/stars/ten-framework/docs?color=ffcb47&labelColor=gray&style=flat-square&logo=github
+[ten-docs-shield]: https://img.shields.io/github/stars/ten-framework/portal?color=ffcb47&labelColor=gray&style=flat-square&logo=github
 
 [ten-framework-link]: https://github.com/ten-framework/ten_framework
 [ten-agent-link]: https://github.com/ten-framework/ten-agent
 
-[ten-framework-banner]: https://github.com/TEN-framework/docs/blob/main/assets/new/ten-portal.jpeg?raw=true
-[ten-agent-banner]: https://github.com/TEN-framework/docs/blob/main/assets/new/ten-agent.jpeg?raw=true
-[tman-designer-banner]: https://github.com/TEN-framework/docs/blob/main/assets/new/tman-manager.jpeg?raw=true
-[ten-docs-banner]: https://github.com/TEN-framework/docs/blob/main/assets/new/ten-doc.jpeg?raw=true
+[ten-framework-banner]: https://ten-framework-assets.s3.us-east-1.amazonaws.com/ten-portal.jpeg
+[ten-agent-banner]: https://ten-framework-assets.s3.us-east-1.amazonaws.com/ten-agent.jpeg
+[tman-designer-banner]: https://ten-framework-assets.s3.us-east-1.amazonaws.com/tman-manager.jpeg
+[ten-docs-banner]: https://ten-framework-assets.s3.us-east-1.amazonaws.com/ten-doc.jpeg
