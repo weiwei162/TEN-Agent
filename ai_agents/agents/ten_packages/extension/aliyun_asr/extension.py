@@ -79,8 +79,11 @@ class AliyunASRExtension(AsyncExtension):
             return
 
         self.stream_id = frame.get_property_int("stream_id")
-        if self.client:
-            self.client.send_audio(frame_buf)
+        if self.client and self.connected:
+            try:
+                self.client.send_audio(frame_buf)
+            except Exception as e:
+                self.ten_env.log_error(f"发送音频帧失败: {e}")
 
     async def on_stop(self, ten_env: AsyncTenEnv) -> None:
         ten_env.log_info("on_stop")
@@ -109,11 +112,16 @@ class AliyunASRExtension(AsyncExtension):
 
         def on_close(*args):
             self.ten_env.log_info(f"aliyun_asr event callback on_close: {args}")
+
+            if not self.connected:
+                return
+
             self.connected = False
             if not self.stopped:
                 self.ten_env.log_warn(
                     "aliyun_asr connection closed unexpectedly. Reconnecting..."
                 )
+                self.loop.call_later(0.2, lambda: self.loop.create_task(self._start_listen()))
 
         def on_message(result, *_):
             if not result:
@@ -157,30 +165,95 @@ class AliyunASRExtension(AsyncExtension):
                 f"aliyun_asr event callback on_error: {message}"
             )
 
-        import nls
+        self.ten_env.log_info("准备导入 nls 库...")
 
-        token = nls.token.getToken(self.config.akid, self.config.aksecret)
-        self.client = nls.NlsSpeechTranscriber(
-            url=self.config.api_url,
-            appkey=self.config.appkey,
-            token=token,
-            on_start=on_start,
-            on_sentence_begin=on_message,
-            on_sentence_end=on_message,
-            on_result_changed=on_message,
-            on_completed=on_message,
-            on_error=on_error,
-            on_close=on_close,
-            callback_args=[],
-        )
+        try:
+            import traceback
+            import sys
+            import multiprocessing
 
-        # connect to websocket
-        self.client.start(
-            aformat="pcm",
-            enable_intermediate_result=True,
-            enable_punctuation_prediction=True,
-            enable_inverse_text_normalization=True,
-        )
+            # 检查nls模块是否已经导入过
+            if 'nls' in sys.modules:
+                self.ten_env.log_info("nls 库已经被导入，直接使用现有模块")
+                import nls
+                nls_imported = True
+            else:
+                nls_imported = False
+
+                # 使用子进程隔离导入nls
+                def import_in_process():
+                    try:
+                        import nls
+                        return True
+                    except Exception:
+                        return False
+
+                # 创建子进程并设置超时
+                self.ten_env.log_info("在子进程中尝试导入 nls 库...")
+                process = multiprocessing.Process(target=import_in_process)
+                process.daemon = True  # 设置为守护进程，确保主进程退出时子进程也会退出
+                process.start()
+
+                # 等待子进程完成，最多等待5秒
+                process.join(5)
+
+                # 检查子进程状态
+                if process.is_alive():
+                    self.ten_env.log_error("nls 库导入在子进程中超时，强制终止")
+                    process.terminate()
+                    process.join(2)  # 给进程2秒时间清理
+
+                    # 如果仍然存活，强制杀死
+                    if process.is_alive():
+                        self.ten_env.log_error("子进程无法正常终止，强制杀死")
+                        process.kill()
+                else:
+                    self.ten_env.log_info("子进程导入尝试已完成")
+
+                # 子进程测试完成后，在主进程中尝试导入
+                try:
+                    self.ten_env.log_info("在主进程中尝试导入 nls 库...")
+                    import nls
+                    nls_imported = True
+                    self.ten_env.log_info("成功导入 nls 库")
+                except Exception as e:
+                    self.ten_env.log_error(f"导入 nls 失败: {e}")
+
+            # 检查是否成功导入nls
+            if not nls_imported:
+                self.ten_env.log_error("无法导入 nls 库，退出初始化")
+                return
+
+            try:
+                token = nls.token.getToken(self.config.akid, self.config.aksecret)
+                self.client = nls.NlsSpeechTranscriber(
+                    url=self.config.api_url,
+                    appkey=self.config.appkey,
+                    token=token,
+                    on_start=on_start,
+                    on_sentence_begin=on_message,
+                    on_sentence_end=on_message,
+                    on_result_changed=on_message,
+                    on_completed=on_message,
+                    on_error=on_error,
+                    on_close=on_close,
+                    callback_args=[],
+                )
+                self.ten_env.log_info("成功创建 NlsSpeechTranscriber 实例")
+
+                # connect to websocket
+                self.ten_env.log_info("启动 NLS 客户端...")
+                self.client.start(
+                    aformat="pcm",
+                    enable_intermediate_result=True,
+                    enable_punctuation_prediction=True,
+                    enable_inverse_text_normalization=True,
+                )
+                self.ten_env.log_info("NLS 客户端启动完成")
+            except Exception as e:
+                self.ten_env.log_error(f"初始化 NLS 客户端失败: {e}\n{traceback.format_exc()}")
+        except Exception as e:
+            self.ten_env.log_error(f"nls 库导入或初始化失败: {e}\n{traceback.format_exc()}")
 
     async def _send_text(
         self, text: str, is_final: bool, stream_id: str
